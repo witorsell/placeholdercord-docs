@@ -69,6 +69,10 @@ await native.bubbles.configure({
     bubbleColor: "#5865F2" // hex string, converted for you
 });
 
+// camera (virtual camera)
+await native.camera.setMedia("/storage/emulated/0/DCIM/photo.jpg"); // path to jpg/mp4/gif
+await native.camera.setMedia(null);             // disable, restore real camera
+
 // files (inside the app's files/pyoncord directory)
 const text = await native.fs.read("bubbles.json");
 await native.fs.write("bubbles.json", JSON.stringify({ enabled: true }));
@@ -93,6 +97,7 @@ The names below are what `native.modules()` returns. Anything here is callable v
 | `test` | Echoes a sample object plus your args. Handy for a round-trip check. |
 | `bubbles.hook` / `bubbles.unhook` | Turn native chat bubbles on or off. |
 | `bubbles.configure` | Set avatar radius (percent), bubble radius, bubble color (int). |
+| `camera.setMedia` | Pass a file path (jpg/mp4/gif) to replace the live camera feed in video calls; pass `null` to restore the real camera. |
 | `fs.read` / `fs.write` / `fs.exists` / `fs.delete` | File access under files/pyoncord. |
 | `fs.getConstants` | Native file path constants. |
 | `app.reload` | Reload the app. |
