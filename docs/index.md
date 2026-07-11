@@ -108,25 +108,33 @@ The names below are what `native.modules()` returns. Anything here is callable v
 To try the bridge without writing a plugin, enable the **Eval Command** (placeholdercord
 settings, Developer), then run the `/eval` command with its **async** option set to `true`.
 
-Keep each run to a single `return <expression>`. The `/eval` sandbox builds a function from your
-text with the `Function` constructor, and this build's runtime parser rejects multi-statement
-bodies (a `const` line, then an `if`, then bare `await` lines) as well as `import`/`export`. A
-single expression works reliably. Run these one at a time:
+Two rules for the `/eval` box, both verified on device:
+
+1. **Do not use the `await` keyword.** With **async = true**, the command already awaits the value
+   you return (`await AsyncFunction(code)()`), so just `return` the promise. This build's runtime
+   `Function`-constructor parser rejects a literal `await` and throws `SyntaxError ... ';' expected`.
+2. **One `return <expression>` per run.** Multi-statement bodies (a `const` line, then an `if`,
+   then more) and `import`/`export` also fail in this sandbox.
+
+So `return <promise>`, async = true, one at a time:
 
 ```js
-return await window.placeholder.native.modules()
+return window.placeholder.native.modules()
 ```
 ```js
-return await window.placeholder.native.bubbles.setEnabled(true)
+return window.placeholder.native.bubbles.setEnabled(true)
 ```
 ```js
-return await window.placeholder.native.bubbles.configure({ avatarRadius: 50, bubbleRadius: 40, bubbleColor: "#5865F2" })
+return window.placeholder.native.bubbles.configure({ avatarRadius: 50, bubbleRadius: 40, bubbleColor: "#5865F2" })
 ```
 
 `modules()` returns the method list. `setEnabled` and `configure` return `undefined` with no
 error, which means the call went through; scroll the channel and the bubbles restyle. To check the
 off path, disable the plugin and run `return typeof window.placeholder` (prints `"undefined"`, no
 crash).
+
+Note this `await` restriction is only the `/eval` sandbox. Inside a real plugin (a normal module),
+`await` works normally.
 
 ## Full example (a plugin)
 
