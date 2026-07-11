@@ -106,18 +106,27 @@ The names below are what `native.modules()` returns. Anything here is callable v
 ## Quick test with /eval
 
 To try the bridge without writing a plugin, enable the **Eval Command** (placeholdercord
-settings, Developer), then run the `/eval` command with its **async** option set to `true` and
-paste plain statements (no `import`, no `export`, use `return` to see a value). The `/eval`
-sandbox is not an ES module, so a plugin file with `export default` will fail there with
-"export declaration must be at top level of module".
+settings, Developer), then run the `/eval` command with its **async** option set to `true`.
+
+Keep each run to a single `return <expression>`. The `/eval` sandbox builds a function from your
+text with the `Function` constructor, and this build's runtime parser rejects multi-statement
+bodies (a `const` line, then an `if`, then bare `await` lines) as well as `import`/`export`. A
+single expression works reliably. Run these one at a time:
 
 ```js
-const native = window.placeholder?.native;
-if (!native) return "bridge OFF, enable the Native Bridge plugin";
-await native.bubbles.setEnabled(true);
-await native.bubbles.configure({ avatarRadius: 50, bubbleRadius: 40, bubbleColor: "#5865F2" });
-return await native.modules();
+return await window.placeholder.native.modules()
 ```
+```js
+return await window.placeholder.native.bubbles.setEnabled(true)
+```
+```js
+return await window.placeholder.native.bubbles.configure({ avatarRadius: 50, bubbleRadius: 40, bubbleColor: "#5865F2" })
+```
+
+`modules()` returns the method list. `setEnabled` and `configure` return `undefined` with no
+error, which means the call went through; scroll the channel and the bubbles restyle. To check the
+off path, disable the plugin and run `return typeof window.placeholder` (prints `"undefined"`, no
+crash).
 
 ## Full example (a plugin)
 
