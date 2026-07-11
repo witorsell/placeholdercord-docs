@@ -103,16 +103,35 @@ The names below are what `native.modules()` returns. Anything here is callable v
 | `showRecoveryAlert` | Show the recovery alert. |
 | `revenge.updater.clear` | Clear the updater state. |
 
-## Full example
+## Quick test with /eval
 
-A tiny plugin that turns on styled bubbles when it starts, guarding for the bridge being off.
+To try the bridge without writing a plugin, enable the **Eval Command** (placeholdercord
+settings, Developer), then run the `/eval` command with its **async** option set to `true` and
+paste plain statements (no `import`, no `export`, use `return` to see a value). The `/eval`
+sandbox is not an ES module, so a plugin file with `export default` will fail there with
+"export declaration must be at top level of module".
+
+```js
+const native = window.placeholder?.native;
+if (!native) return "bridge OFF, enable the Native Bridge plugin";
+await native.bubbles.setEnabled(true);
+await native.bubbles.configure({ avatarRadius: 50, bubbleRadius: 40, bubbleColor: "#5865F2" });
+return await native.modules();
+```
+
+## Full example (a plugin)
+
+This is a **plugin file**, not an `/eval` snippet. Install it as a plugin; do not paste it into
+`/eval`. It turns on styled bubbles when it starts and guards for the bridge being off. Get
+`showToast` from your plugin API (for example `vendetta.ui.toasts.showToast`); the guard below
+falls back to a log so the sample runs anywhere.
 
 ```js
 export default {
     start() {
         const native = window.placeholder?.native;
         if (!native) {
-            showToast("Enable the Native Bridge plugin first");
+            console.warn("[my-plugin] Native Bridge is off; enable it to style bubbles");
             return;
         }
         native.bubbles.setEnabled(true);
@@ -133,4 +152,7 @@ export default {
 - The bridge needs a patched build with the current placeholderxposed module. If a call rejects
   with "FileReaderModule.readAsDataURL is unavailable", the native side is missing or out of date;
   repatch with the Manager.
-- Config-style native changes (like bubbles) apply on the next reload of the chat, not per frame.
+- Config-style native changes (like bubbles) update native state immediately, but a message
+  restyles only when its row is next drawn. Messages already on screen keep their old look until
+  something re-renders them: scrolling, switching channels, a new message, or an app reload. You
+  do not need to restart to see the change, just scroll the channel.
