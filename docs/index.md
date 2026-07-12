@@ -66,8 +66,8 @@ await native.bubbles.configure({ avatarRadius: 30 });
 
 ### The helper both shipped plugins use
 
-[**Bubble Chat**](https://witorsell.github.io/placeholdercord-plugins/BubbleChat/) and
-[**Virtual Camera**](https://witorsell.github.io/placeholdercord-plugins/VirtualCamera/) are the
+[**Bubble Chat**](https://github.com/witorsell/placeholdercord-plugins/blob/main/plugins/BubbleChat/index.ts) and
+[**Virtual Camera**](https://github.com/witorsell/placeholdercord-plugins/blob/main/plugins/VirtualCamera/index.ts) are the
 two most complete plugins built on the bridge, and they both wrap the guard above in the same
 small helper instead of repeating the optional chain everywhere:
 
@@ -224,8 +224,8 @@ crash).
 ## Full example
 
 A minimal plugin, guard and all, looks like the previous section. But
-[**Bubble Chat**](https://witorsell.github.io/placeholdercord-plugins/BubbleChat/) and
-[**Virtual Camera**](https://witorsell.github.io/placeholdercord-plugins/VirtualCamera/), the two
+[**Bubble Chat**](https://github.com/witorsell/placeholdercord-plugins/blob/main/plugins/BubbleChat/index.ts) and
+[**Virtual Camera**](https://github.com/witorsell/placeholdercord-plugins/blob/main/plugins/VirtualCamera/index.ts), the two
 shipped plugins, go one step further: if the bridge is missing when
 the plugin loads, they don't just skip silently, they toast a reason and throw, which makes the
 plugin manager flip the plugin back off. This is the shape to copy for anything that is *useless*
@@ -275,8 +275,8 @@ export default {
 
 ### Error messages in the wild
 
-The exact strings [Bubble Chat](https://witorsell.github.io/placeholdercord-plugins/BubbleChat/)
-and [Virtual Camera](https://witorsell.github.io/placeholdercord-plugins/VirtualCamera/) show a
+The exact strings [Bubble Chat](https://github.com/witorsell/placeholdercord-plugins/blob/main/plugins/BubbleChat/index.ts)
+and [Virtual Camera](https://github.com/witorsell/placeholdercord-plugins/blob/main/plugins/VirtualCamera/index.ts) show a
 user, for reference:
 
 | Where | Message |
