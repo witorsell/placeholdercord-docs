@@ -101,7 +101,8 @@ Convenience wrappers over `native.call` for the common methods.
 
 ```js
 // bubbles
-native.bubbles.setEnabled(true);          // or false
+native.bubbles.setEnabled(true).then(v => console.log(v));   // resolves true
+native.bubbles.setEnabled(false).then(v => console.log(v));  // resolves false
 native.bubbles.configure({
     avatarRadius: 30,      // percent, 0 square to 50 circle
     bubbleRadius: 40,      // corner radius
@@ -109,8 +110,10 @@ native.bubbles.configure({
 });
 
 // camera (virtual camera)
-native.camera.setMedia("/storage/emulated/0/DCIM/photo.jpg"); // path to jpg/mp4/gif
-native.camera.setMedia(null);             // disable, restore real camera
+native.camera.setMedia("/storage/emulated/0/DCIM/photo.jpg") // path to jpg/mp4/gif
+    .then(v => console.log(v));                              // resolves that same path
+native.camera.setMedia(null)                                 // disable, restore real camera
+    .then(v => console.log(v));                              // resolves null
 
 // files (inside the app's files/pyoncord directory)
 native.fs.read("bubbles.json").then(text => console.log(text));
@@ -141,14 +144,14 @@ The names below are what `native.modules()` returns. Anything here is callable v
   <div class="catalog-group">
     <p class="catalog-group-name">bubbles</p>
     <dl>
-      <div class="catalog-row"><dt><code>bubbles.hook</code> / <code>bubbles.unhook</code></dt><dd>Turn native chat bubbles on or off.</dd></div>
+      <div class="catalog-row"><dt><code>bubbles.hook</code> / <code>bubbles.unhook</code></dt><dd>Turn native chat bubbles on or off. Resolves to <code>true</code> / <code>false</code>.</dd></div>
       <div class="catalog-row"><dt><code>bubbles.configure</code></dt><dd>Set avatar radius (percent), bubble radius, bubble color (int).</dd></div>
     </dl>
   </div>
   <div class="catalog-group">
     <p class="catalog-group-name">camera</p>
     <dl>
-      <div class="catalog-row"><dt><code>camera.setMedia</code></dt><dd>Pass a file path (jpg/mp4/gif) to replace the live camera feed in video calls; pass <code>null</code> to restore the real camera.</dd></div>
+      <div class="catalog-row"><dt><code>camera.setMedia</code></dt><dd>Pass a file path (jpg/mp4/gif) to replace the live camera feed in video calls; pass <code>null</code> to restore the real camera. Resolves to that same path, or <code>null</code>.</dd></div>
     </dl>
   </div>
   <div class="catalog-group">
@@ -209,8 +212,10 @@ return window.placeholder.native.bubbles.setEnabled(true)
 return window.placeholder.native.bubbles.configure({ avatarRadius: 50, bubbleRadius: 40, bubbleColor: "#5865F2" })
 ```
 
-`modules()` returns the method list. `setEnabled` and `configure` return `undefined` with no
-error, which means the call went through; scroll the channel and the bubbles restyle.
+`modules()` returns the method list. `setEnabled` resolves to the same boolean you passed in
+(`true`/`false`), confirming the native side actually applied it; `configure` resolves to the full
+`BubbleState`, `{ enabled, avatarRadius, bubbleRadius, bubbleColor }`. Either way, scroll the
+channel and the bubbles restyle.
 
 Because multi-statement bodies work, you can layer several checks into one diagnostic instead of
 running three separate `/eval`s:
