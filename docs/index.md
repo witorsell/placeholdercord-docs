@@ -60,7 +60,7 @@ if (!native) {
     showToast("Enable the Native Bridge plugin to use this feature");
     return;
 }
-await native.bubbles.configure({ avatarRadius: 30 });
+native.bubbles.configure({ avatarRadius: 30 });
 ```
 </div>
 
@@ -90,9 +90,9 @@ The generic caller. Sends any registered native method by name and resolves to i
 or throws if the native method throws.
 
 ```js
-const info = await native.call("info");        // { name, version }
-const names = await native.call("modules");     // string[] of every callable method
-await native.call("app.reload");
+native.call("info").then(info => console.log(info));      // { name, version }
+native.call("modules").then(names => console.log(names)); // string[] of every callable method
+native.call("app.reload");
 ```
 
 ### Typed wrappers
