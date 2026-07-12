@@ -62,27 +62,27 @@ Convenience wrappers over `native.call` for the common methods.
 
 ```js
 // bubbles
-await native.bubbles.setEnabled(true);          // or false
-await native.bubbles.configure({
+native.bubbles.setEnabled(true);          // or false
+native.bubbles.configure({
     avatarRadius: 30,      // percent, 0 square to 50 circle
     bubbleRadius: 40,      // corner radius
     bubbleColor: "#5865F2" // hex string, converted for you
 });
 
 // camera (virtual camera)
-await native.camera.setMedia("/storage/emulated/0/DCIM/photo.jpg"); // path to jpg/mp4/gif
-await native.camera.setMedia(null);             // disable, restore real camera
+native.camera.setMedia("/storage/emulated/0/DCIM/photo.jpg"); // path to jpg/mp4/gif
+native.camera.setMedia(null);             // disable, restore real camera
 
 // files (inside the app's files/pyoncord directory)
-const text = await native.fs.read("bubbles.json");
-await native.fs.write("bubbles.json", JSON.stringify({ enabled: true }));
-const there = await native.fs.exists("bubbles.json");
+native.fs.read("bubbles.json").then(text => console.log(text));
+native.fs.write("bubbles.json", JSON.stringify({ enabled: true }));
+native.fs.exists("bubbles.json").then(there => console.log(there));
 
 // app
-await native.app.reload();
+native.app.reload();
 
 // discovery
-const methods = await native.modules();
+native.modules().then(methods => console.log(methods));
 ```
 
 ## Method catalog
@@ -138,8 +138,13 @@ error, which means the call went through; scroll the channel and the bubbles res
 off path, disable the plugin and run `return typeof window.placeholder` (prints `"undefined"`, no
 crash).
 
-Note this `await` restriction is only the `/eval` sandbox. Inside a real plugin (a normal module),
-`await` works normally.
+## IMPORTANT: async/await is unsupported in plugins
+
+Do NOT use `async` or `await` anywhere in your plugin code. The Hermes JavaScript engine used in this build of Discord does not natively support `async`/`await` keywords, and the default SWC compiler configuration excludes generator transformations to avoid bloated bundle sizes. 
+
+If you use `async`/`await` in your plugin, the engine will immediately throw a `SyntaxError: async functions are unsupported` when it attempts to evaluate your plugin, and it will silently fail to load.
+
+Instead, always use raw Promise chains (`.then()` and `.catch()`).
 
 ## Full example (a plugin)
 
