@@ -1,3 +1,7 @@
-theme: jekyll-theme-cayman
 title: placeholdercord native bridge
 description: Call the native layer from your plugins
+markdown: kramdown
+kramdown:
+  input: GFM
+  auto_ids: true
+highlighter: rouge

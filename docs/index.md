@@ -1,7 +1,24 @@
-# placeholdercord native bridge
+---
+layout: default
+title: placeholdercord native bridge
+description: Call the native layer from your plugins
+---
 
-The native bridge lets a plugin call placeholdercord's native (Kotlin/placeholderxposed)
-layer from JavaScript. You call a native method by name and get its result back as a promise.
+<p class="hero-kicker">placeholdercord &middot; native bridge</p>
+<h1 class="hero-title">Call native from JS.</h1>
+<p class="hero-sub">The native bridge lets a plugin call placeholdercord's native (Kotlin/placeholderxposed) layer from JavaScript. You call a method by name and get its result back as a promise.</p>
+
+<div class="bridge-hero">
+  <div class="bridge-node bridge-node--js">
+    <span class="bridge-node-label">JS &middot; your plugin</span>
+    <code>native.bubbles.configure({ avatarRadius: 30 })</code>
+  </div>
+  <div class="bridge-link"><span class="bridge-dot"></span></div>
+  <div class="bridge-node bridge-node--native">
+    <span class="bridge-node-label">Native &middot; placeholderxposed</span>
+    <code>draws a rounded bubble in MessageView</code>
+  </div>
+</div>
 
 ## The boundary
 
@@ -19,22 +36,25 @@ The bridge is a built-in plugin called **Native Bridge**, and it is **off by def
 enables it under placeholdercord settings, Plugins, Native Bridge. While it is on, the API lives
 at `window.placeholder.native`. While it is off, `window.placeholder` is `undefined`.
 
-## Read this first: never assume the bridge is on
+## Never assume the bridge is on
 
 Because the user can disable it, `window.placeholder` may be `undefined`. Destructuring it blindly
-crashes the whole client:
+crashes the whole client.
+
+<div class="callout callout-bad" markdown="1">
+  <p class="callout-label">Wrong</p>
 
 ```js
-// WRONG. If the bridge is off this throws
-// TypeError: Cannot read properties of undefined (reading 'native')
-// and takes down the client.
 const { native } = window.placeholder;
 ```
 
-Always guard with optional chaining and bail with a message if it is missing:
+  <p class="callout-note">If the bridge is off this throws <code>TypeError: Cannot read properties of undefined (reading 'native')</code> and takes down the client.</p>
+</div>
+
+<div class="callout callout-good" markdown="1">
+  <p class="callout-label">Right</p>
 
 ```js
-// RIGHT
 const native = window.placeholder?.native;
 if (!native) {
     showToast("Enable the Native Bridge plugin to use this feature");
@@ -42,6 +62,7 @@ if (!native) {
 }
 await native.bubbles.configure({ avatarRadius: 30 });
 ```
+</div>
 
 ## API
 
@@ -88,25 +109,60 @@ native.modules().then(methods => console.log(methods));
 ## Method catalog
 
 The names below are what `native.modules()` returns. Anything here is callable via
-`native.call(name, ...args)` even if it does not have a typed wrapper yet.
+`native.call(name, ...args)` even if it does not have a typed wrapper yet. Grouped by namespace.
 
-| Method | Purpose |
-| --- | --- |
-| `info` | Loader name and version code. |
-| `modules` | List of every registered method name. |
-| `test` | Echoes a sample object plus your args. Handy for a round-trip check. |
-| `bubbles.hook` / `bubbles.unhook` | Turn native chat bubbles on or off. |
-| `bubbles.configure` | Set avatar radius (percent), bubble radius, bubble color (int). |
-| `camera.setMedia` | Pass a file path (jpg/mp4/gif) to replace the live camera feed in video calls; pass `null` to restore the real camera. |
-| `fs.read` / `fs.write` / `fs.exists` / `fs.delete` | File access under files/pyoncord. |
-| `fs.getConstants` | Native file path constants. |
-| `app.reload` | Reload the app. |
-| `plugins.states.read` / `plugins.states.write` | Read or write plugin enabled state. |
-| `caches.modules.read` / `caches.modules.write` | Metro module cache. |
-| `caches.assets.read` / `caches.assets.write` | Asset cache. |
-| `alertError` | Show a native error alert. |
-| `showRecoveryAlert` | Show the recovery alert. |
-| `revenge.updater.clear` | Clear the updater state. |
+<div class="catalog">
+  <div class="catalog-group">
+    <p class="catalog-group-name">core</p>
+    <dl>
+      <div class="catalog-row"><dt><code>info</code></dt><dd>Loader name and version code.</dd></div>
+      <div class="catalog-row"><dt><code>modules</code></dt><dd>List of every registered method name.</dd></div>
+      <div class="catalog-row"><dt><code>test</code></dt><dd>Echoes a sample object plus your args. Handy for a round-trip check.</dd></div>
+    </dl>
+  </div>
+  <div class="catalog-group">
+    <p class="catalog-group-name">bubbles</p>
+    <dl>
+      <div class="catalog-row"><dt><code>bubbles.hook</code> / <code>bubbles.unhook</code></dt><dd>Turn native chat bubbles on or off.</dd></div>
+      <div class="catalog-row"><dt><code>bubbles.configure</code></dt><dd>Set avatar radius (percent), bubble radius, bubble color (int).</dd></div>
+    </dl>
+  </div>
+  <div class="catalog-group">
+    <p class="catalog-group-name">camera</p>
+    <dl>
+      <div class="catalog-row"><dt><code>camera.setMedia</code></dt><dd>Pass a file path (jpg/mp4/gif) to replace the live camera feed in video calls; pass <code>null</code> to restore the real camera.</dd></div>
+    </dl>
+  </div>
+  <div class="catalog-group">
+    <p class="catalog-group-name">fs</p>
+    <dl>
+      <div class="catalog-row"><dt><code>fs.read</code> / <code>fs.write</code> / <code>fs.exists</code> / <code>fs.delete</code></dt><dd>File access under files/pyoncord.</dd></div>
+      <div class="catalog-row"><dt><code>fs.getConstants</code></dt><dd>Native file path constants.</dd></div>
+    </dl>
+  </div>
+  <div class="catalog-group">
+    <p class="catalog-group-name">app</p>
+    <dl>
+      <div class="catalog-row"><dt><code>app.reload</code></dt><dd>Reload the app.</dd></div>
+    </dl>
+  </div>
+  <div class="catalog-group">
+    <p class="catalog-group-name">plugins &amp; caches</p>
+    <dl>
+      <div class="catalog-row"><dt><code>plugins.states.read</code> / <code>plugins.states.write</code></dt><dd>Read or write plugin enabled state.</dd></div>
+      <div class="catalog-row"><dt><code>caches.modules.read</code> / <code>caches.modules.write</code></dt><dd>Metro module cache.</dd></div>
+      <div class="catalog-row"><dt><code>caches.assets.read</code> / <code>caches.assets.write</code></dt><dd>Asset cache.</dd></div>
+    </dl>
+  </div>
+  <div class="catalog-group">
+    <p class="catalog-group-name">system</p>
+    <dl>
+      <div class="catalog-row"><dt><code>alertError</code></dt><dd>Show a native error alert.</dd></div>
+      <div class="catalog-row"><dt><code>showRecoveryAlert</code></dt><dd>Show the recovery alert.</dd></div>
+      <div class="catalog-row"><dt><code>revenge.updater.clear</code></dt><dd>Clear the updater state.</dd></div>
+    </dl>
+  </div>
+</div>
 
 ## Quick test with /eval
 
@@ -138,15 +194,14 @@ error, which means the call went through; scroll the channel and the bubbles res
 off path, disable the plugin and run `return typeof window.placeholder` (prints `"undefined"`, no
 crash).
 
-## IMPORTANT: async/await is unsupported in plugins
+## Async/await is unsupported
 
-Do NOT use `async` or `await` anywhere in your plugin code. The Hermes JavaScript engine used in this build of Discord does not natively support `async`/`await` keywords, and the default SWC compiler configuration excludes generator transformations to avoid bloated bundle sizes. 
+<div class="callout callout-warn">
+  <p class="callout-label">Warning</p>
+  <p class="callout-note">Do NOT use <code>async</code> or <code>await</code> anywhere in your plugin code. The Hermes JavaScript engine used in this build of Discord does not natively support <code>async</code>/<code>await</code>, and the default SWC compiler configuration excludes generator transformations to avoid bloated bundle sizes. The engine throws <code>SyntaxError: async functions are unsupported</code> immediately on evaluation, and your plugin silently fails to load. Use raw Promise chains (<code>.then()</code> and <code>.catch()</code>) instead.</p>
+</div>
 
-If you use `async`/`await` in your plugin, the engine will immediately throw a `SyntaxError: async functions are unsupported` when it attempts to evaluate your plugin, and it will silently fail to load.
-
-Instead, always use raw Promise chains (`.then()` and `.catch()`).
-
-## Full example (a plugin)
+## Full example
 
 This is a **plugin file**, not an `/eval` snippet. Install it as a plugin; do not paste it into
 `/eval`. It turns on styled bubbles when it starts and guards for the bridge being off. Get

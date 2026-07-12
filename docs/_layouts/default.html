@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page.title | default: site.title }}</title>
+  <meta name="description" content="{{ page.description | default: site.description }}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230b0d14'/><circle cx='9' cy='16' r='4' fill='%237c8cff'/><circle cx='23' cy='16' r='4' fill='%23ff9f6b'/><path d='M13 16h6' stroke='%238b8fa3' stroke-width='2' stroke-dasharray='2 2'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+</head>
+<body>
+  <input type="checkbox" id="nav-toggle" class="nav-toggle">
+
+  <header class="topbar">
+    <a class="topbar-brand" href="{{ '/' | relative_url }}">
+      <span class="brand-mark" aria-hidden="true">
+        <span class="brand-dot brand-dot--js"></span><span class="brand-wire"></span><span class="brand-dot brand-dot--native"></span>
+      </span>
+      placeholdercord
+    </a>
+    <label for="nav-toggle" class="topbar-toggle" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-link" href="https://github.com/witorsell/placeholdercord" target="_blank" rel="noopener">source</a>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" aria-label="Table of contents">
+      <p class="sidebar-kicker">on this page</p>
+      <ol class="sidebar-list">
+        <li><a href="#the-boundary">The boundary</a></li>
+        <li><a href="#enabling-it">Enabling it</a></li>
+        <li><a href="#never-assume-the-bridge-is-on">Never assume it's on</a></li>
+        <li><a href="#api">API</a></li>
+        <li><a href="#method-catalog">Method catalog</a></li>
+        <li><a href="#quick-test-with-eval">Quick test with /eval</a></li>
+        <li><a href="#asyncawait-is-unsupported">Async/await warning</a></li>
+        <li><a href="#full-example">Full example</a></li>
+        <li><a href="#notes">Notes</a></li>
+      </ol>
+    </nav>
+
+    <main class="content">
+      {{ content }}
+    </main>
+  </div>
+
+  <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+</body>
+</html>
