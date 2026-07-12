@@ -6,7 +6,7 @@ description: Call the native layer from your plugins
 
 <p class="hero-kicker">placeholdercord &middot; native bridge</p>
 <h1 class="hero-title">Call native from JS.</h1>
-<p class="hero-sub">The native bridge lets a plugin call placeholdercord's native (Kotlin/placeholderxposed) layer from JavaScript. You call a method by name and get its result back as a promise.</p>
+<p class="hero-sub">The native bridge lets a plugin call <a href="https://github.com/witorsell/placeholdercord" target="_blank" rel="noopener">placeholdercord</a>'s native (Kotlin/<a href="https://github.com/witorsell/placeholderxposed" target="_blank" rel="noopener">placeholderxposed</a>) layer from JavaScript. You call a method by name and get its result back as a promise.</p>
 
 <div class="bridge-hero">
   <div class="bridge-node bridge-node--js">
@@ -15,7 +15,7 @@ description: Call the native layer from your plugins
   </div>
   <div class="bridge-link"><span class="bridge-dot"></span></div>
   <div class="bridge-node bridge-node--native">
-    <span class="bridge-node-label">Native &middot; placeholderxposed</span>
+    <span class="bridge-node-label">Native &middot; <a href="https://github.com/witorsell/placeholderxposed" target="_blank" rel="noopener">placeholderxposed</a></span>
     <code>draws a rounded bubble in MessageView</code>
   </div>
 </div>
@@ -66,9 +66,10 @@ await native.bubbles.configure({ avatarRadius: 30 });
 
 ### The helper both shipped plugins use
 
-**Bubble Chat** and **Virtual Camera** are the two most complete plugins built on the bridge, and
-they both wrap the guard above in the same small helper instead of repeating the optional chain
-everywhere:
+[**Bubble Chat**](https://witorsell.github.io/placeholdercord-plugins/BubbleChat/) and
+[**Virtual Camera**](https://witorsell.github.io/placeholdercord-plugins/VirtualCamera/) are the
+two most complete plugins built on the bridge, and they both wrap the guard above in the same
+small helper instead of repeating the optional chain everywhere:
 
 ```js
 function getNative() {
@@ -222,8 +223,10 @@ crash).
 
 ## Full example
 
-A minimal plugin, guard and all, looks like the previous section. But **Bubble Chat** and
-**Virtual Camera**, the two shipped plugins, go one step further: if the bridge is missing when
+A minimal plugin, guard and all, looks like the previous section. But
+[**Bubble Chat**](https://witorsell.github.io/placeholdercord-plugins/BubbleChat/) and
+[**Virtual Camera**](https://witorsell.github.io/placeholdercord-plugins/VirtualCamera/), the two
+shipped plugins, go one step further: if the bridge is missing when
 the plugin loads, they don't just skip silently, they toast a reason and throw, which makes the
 plugin manager flip the plugin back off. This is the shape to copy for anything that is *useless*
 without the bridge.
@@ -272,7 +275,9 @@ export default {
 
 ### Error messages in the wild
 
-The exact strings Bubble Chat and Virtual Camera show a user, for reference:
+The exact strings [Bubble Chat](https://witorsell.github.io/placeholdercord-plugins/BubbleChat/)
+and [Virtual Camera](https://witorsell.github.io/placeholdercord-plugins/VirtualCamera/) show a
+user, for reference:
 
 | Where | Message |
 | --- | --- |
@@ -288,9 +293,9 @@ rejection message instead of a generic "something went wrong."
 
 ## Notes
 
-- The bridge needs a patched build with the current placeholderxposed module. If a call rejects
-  with "FileReaderModule.readAsDataURL is unavailable", the native side is missing or out of date;
-  repatch with the Manager.
+- The bridge needs a patched build with the current [placeholderxposed](https://github.com/witorsell/placeholderxposed)
+  module. If a call rejects with "FileReaderModule.readAsDataURL is unavailable", the native side
+  is missing or out of date; repatch with the [Manager](https://github.com/witorsell/placeholdermanager).
 - Config-style native changes (like bubbles) update native state immediately, but a message
   restyles only when its row is next drawn. Messages already on screen keep their old look until
   something re-renders them: scrolling, switching channels, a new message, or an app reload. You
