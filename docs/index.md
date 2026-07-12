@@ -187,15 +187,17 @@ The names below are what `native.modules()` returns. Anything here is callable v
 To try the bridge without writing a plugin, enable the **Eval Command** (placeholdercord
 settings, Developer), then run the `/eval` command with its **async** option set to `true`.
 
-Two rules for the `/eval` box, both verified on device:
+Under the hood, `/eval` with **async = true** does `AsyncFunction(yourCode)()`, so whatever you
+type becomes the literal body of a function, not a single wrapped expression. That means normal
+multi-statement JS, `if`, `const`, several `return`s, is completely fine. The only two real limits:
 
-1. **Do not use the `await` keyword**, just `return` the promise; **async = true** already awaits
-   it for you. See [Async/await is unsupported](#asyncawait-is-unsupported) below for what
-   happens if you type it anyway.
-2. **One `return <expression>` per run.** Multi-statement bodies (a `const` line, then an `if`,
-   then more) and `import`/`export` also fail in this sandbox.
+1. **No `await` keyword.** The function is already awaited for you, so just `return` a promise
+   instead. See [Async/await is unsupported](#asyncawait-is-unsupported) below for what happens if
+   you type it anyway; same underlying limitation as plugins.
+2. **No `import`/`export`.** Ordinary JS rule, nothing sandbox-specific: those aren't legal inside
+   a function body regardless of engine.
 
-So `return <promise>`, async = true, one at a time:
+A one-shot call looks like this:
 
 ```js
 return window.placeholder.native.modules()
@@ -208,9 +210,22 @@ return window.placeholder.native.bubbles.configure({ avatarRadius: 50, bubbleRad
 ```
 
 `modules()` returns the method list. `setEnabled` and `configure` return `undefined` with no
-error, which means the call went through; scroll the channel and the bubbles restyle. To check the
-off path, disable the plugin and run `return typeof window.placeholder` (prints `"undefined"`, no
-crash).
+error, which means the call went through; scroll the channel and the bubbles restyle.
+
+Because multi-statement bodies work, you can layer several checks into one diagnostic instead of
+running three separate `/eval`s:
+
+```js
+if (!window.placeholder?.native) {
+    return "bridge OFF or not loaded yet";
+}
+if (!window.placeholder.native.camera) {
+    return "bridge ON, but missing camera API (you need to fetch the newly built placeholdercord.js bundle!)";
+}
+return window.placeholder.native.camera.setMedia(null)
+    .then(() => "success: bridge and virtual camera native module are fully working!")
+    .catch(e => "error: " + e.message);
+```
 
 ## Async/await is unsupported
 
