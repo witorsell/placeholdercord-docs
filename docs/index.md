@@ -109,8 +109,8 @@ native.bubbles.configure({
     bubbleColor: "#5865F2" // hex string, converted for you
 });
 
-// camera (virtual camera)
-native.camera.setMedia("/storage/emulated/0/DCIM/photo.jpg") // path to jpg/mp4/gif
+// camera (virtual camera), static images only, see the note below
+native.camera.setMedia("/storage/emulated/0/DCIM/photo.jpg") // path to a jpg/png
     .then(v => console.log(v));                              // resolves that same path
 native.camera.setMedia(null)                                 // disable, restore real camera
     .then(v => console.log(v));                              // resolves null
@@ -151,7 +151,7 @@ The names below are what `native.modules()` returns. Anything here is callable v
   <div class="catalog-group">
     <p class="catalog-group-name">camera</p>
     <dl>
-      <div class="catalog-row"><dt><code>camera.setMedia</code></dt><dd>Pass a file path (jpg/mp4/gif) to replace the live camera feed in video calls; pass <code>null</code> to restore the real camera. Resolves to that same path, or <code>null</code>.</dd></div>
+      <div class="catalog-row"><dt><code>camera.setMedia</code></dt><dd>Pass a static image path (jpg/png) to replace the live camera feed in video calls; pass <code>null</code> to restore the real camera. Resolves to that same path, or <code>null</code>. Video files don't decode and a GIF only shows its first frame, the native side decodes the file once into a bitmap and loops it.</dd></div>
     </dl>
   </div>
   <div class="catalog-group">
