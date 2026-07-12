@@ -64,6 +64,23 @@ await native.bubbles.configure({ avatarRadius: 30 });
 ```
 </div>
 
+### The helper both shipped plugins use
+
+**Bubble Chat** and **Virtual Camera** are the two most complete plugins built on the bridge, and
+they both wrap the guard above in the same small helper instead of repeating the optional chain
+everywhere:
+
+```js
+function getNative() {
+    const w = window;
+    return (w.placeholder && w.placeholder.native) || null;
+}
+```
+
+`getNative()` never throws; it returns the live API or `null`. Everything downstream, settings
+screens, apply buttons, `onLoad`, checks the return value instead of touching `window.placeholder`
+directly.
+
 ## API
 
 ### native.call(method, ...args)
@@ -203,31 +220,69 @@ crash).
 
 ## Full example
 
-This is a **plugin file**, not an `/eval` snippet. Install it as a plugin; do not paste it into
-`/eval`. It turns on styled bubbles when it starts and guards for the bridge being off. Get
-`showToast` from your plugin API (for example `vendetta.ui.toasts.showToast`); the guard below
-falls back to a log so the sample runs anywhere.
+A minimal plugin, guard and all, looks like the previous section. But **Bubble Chat** and
+**Virtual Camera**, the two shipped plugins, go one step further: if the bridge is missing when
+the plugin loads, they don't just skip silently, they toast a reason and throw, which makes the
+plugin manager flip the plugin back off. This is the shape to copy for anything that is *useless*
+without the bridge.
 
 ```js
+function getNative() {
+    const w = window;
+    return (w.placeholder && w.placeholder.native) || null;
+}
+
+function toast(msg) {
+    try { showToast(msg); } catch {}
+}
+
+function apply() {
+    const native = getNative();
+    if (!native) {
+        toast("Enable the Native Bridge plugin first");
+        return;
+    }
+    native.bubbles.setEnabled(true);
+    native.bubbles.configure({
+        avatarRadius: 50,
+        bubbleRadius: 40,
+        bubbleColor: "#5865F2",
+    }).catch((e) => {
+        toast("Bubble error: " + (e?.message ?? e));
+    });
+}
+
 export default {
-    start() {
-        const native = window.placeholder?.native;
-        if (!native) {
-            console.warn("[my-plugin] Native Bridge is off; enable it to style bubbles");
-            return;
+    onLoad() {
+        // Nothing to drive without the bridge, so disable this plugin instead of loading
+        // half-broken. Throwing here is what makes the plugin manager set enabled back to false.
+        if (!getNative()) {
+            toast("Bubble Chat needs the Native Bridge plugin enabled. Disabling.");
+            throw new Error("Native Bridge plugin is not enabled");
         }
-        native.bubbles.setEnabled(true);
-        native.bubbles.configure({
-            avatarRadius: 50,
-            bubbleRadius: 40,
-            bubbleColor: "#5865F2",
-        });
+        apply();
     },
-    stop() {
-        window.placeholder?.native?.bubbles.setEnabled(false);
+    onUnload() {
+        getNative()?.bubbles.setEnabled(false);
     },
 };
 ```
+
+### Error messages in the wild
+
+The exact strings Bubble Chat and Virtual Camera show a user, for reference:
+
+| Where | Message |
+| --- | --- |
+| Settings screen, bridge off | "Native Bridge is off. Enable the Native Bridge plugin to use bubbles." |
+| Settings screen, bridge off (Virtual Camera) | "Native Bridge is off. Enable the Native Bridge plugin to use the virtual camera." |
+| Trying to change a setting with the bridge off | "Enable the Native Bridge plugin first" |
+| `onLoad`, bridge missing, plugin disables itself | "Bubble Chat needs the Native Bridge plugin enabled. Disabling." |
+| A native call rejects | "Bubble error: " + the rejection's message, or plain "Error: " + message |
+
+Two habits worth copying: the inline warning text lives right in the settings UI (not just a
+toast, so it's still visible after the toast fades), and every `.catch()` reports the real
+rejection message instead of a generic "something went wrong."
 
 ## Notes
 
