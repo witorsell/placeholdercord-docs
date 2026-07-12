@@ -188,9 +188,9 @@ settings, Developer), then run the `/eval` command with its **async** option set
 
 Two rules for the `/eval` box, both verified on device:
 
-1. **Do not use the `await` keyword.** With **async = true**, the command already awaits the value
-   you return (`await AsyncFunction(code)()`), so just `return` the promise. This build's runtime
-   `Function`-constructor parser rejects a literal `await` and throws `SyntaxError ... ';' expected`.
+1. **Do not use the `await` keyword**, just `return` the promise; **async = true** already awaits
+   it for you. See [Async/await is unsupported](#asyncawait-is-unsupported) below for what
+   happens if you type it anyway.
 2. **One `return <expression>` per run.** Multi-statement bodies (a `const` line, then an `if`,
    then more) and `import`/`export` also fail in this sandbox.
 
@@ -215,7 +215,9 @@ crash).
 
 <div class="callout callout-warn">
   <p class="callout-label">Warning</p>
-  <p class="callout-note">Do NOT use <code>async</code> or <code>await</code> anywhere in your plugin code. The Hermes JavaScript engine used in this build of Discord does not natively support <code>async</code>/<code>await</code>, and the default SWC compiler configuration excludes generator transformations to avoid bloated bundle sizes. The engine throws <code>SyntaxError: async functions are unsupported</code> immediately on evaluation, and your plugin silently fails to load. Use raw Promise chains (<code>.then()</code> and <code>.catch()</code>) instead.</p>
+  <p class="callout-note">This build of Hermes has no <code>async</code>/<code>await</code> support, full stop. It shows up two ways depending on where the code runs.</p>
+  <p class="callout-note"><strong>In a plugin file:</strong> the default SWC config excludes generator transformations, so <code>async</code>/<code>await</code> reach Hermes untouched. The engine throws <code>SyntaxError: async functions are unsupported</code> the moment your plugin is evaluated, and it silently fails to load. Use raw Promise chains (<code>.then()</code> and <code>.catch()</code>) instead.</p>
+  <p class="callout-note"><strong>In <code>/eval</code>:</strong> the command already wraps your returned value in an awaited async function, so a literal <code>await</code> inside your snippet hits a different, generic <code>SyntaxError ... ';' expected</code> instead. Just <code>return</code> the promise.</p>
 </div>
 
 ## Full example
